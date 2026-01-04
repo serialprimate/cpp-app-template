@@ -1,0 +1,327 @@
+{
+    "version": 8,
+    "configurePresets": [
+        {
+            "name": "base-configure",
+            "hidden": true,
+            "generator": "Unix Makefiles",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "installDir": "${sourceDir}/build/${presetName}/install",
+            "cacheVariables": {
+                "CMAKE_CXX_COMPILER": "g++",
+                "CMAKE_INTERPROCEDURAL_OPTIMIZATION": false,
+                "CMAKE_EXPORT_COMPILE_COMMANDS": true,
+                "CMAKE_COLOR_DIAGNOSTICS": false,
+                "BUILD_SHARED_LIBS": false,
+                "ENABLE_ASAN": false,
+                "ENABLE_TSAN": false,
+                "ENABLE_UBSAN": false,
+                "VCPKG_TARGET_TRIPLET": "arm64-linux-gnu",
+                "VCPKG_OVERLAY_TRIPLETS": "${sourceDir}/vcpkg/triplets",
+                "VCPKG_BOOTSTRAP_OPTIONS": "-disableMetrics",
+                "VCPKG_INSTALL_OPTIONS": "--clean-after-build"
+            },
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Linux"
+            },
+            "warnings": {
+                "dev": false,
+                "deprecated": true,
+                "uninitialized": true,
+                "unusedCli": true
+            },
+            "errors": {
+                "dev": false,
+                "deprecated": true
+            },
+            "environment": {
+                "VCPKG_BINARY_SOURCES": "clear;files,${sourceDir}/vcpkg/cache,readwrite"
+            },
+            "toolchainFile": "${sourceDir}/external/vcpkg/scripts/buildsystems/vcpkg.cmake"
+        },
+        {
+            "name": "debug-arm64",
+            "inherits": "base-configure",
+            "hidden": false,
+            "displayName": "Debug (ARM64)",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_INTERPROCEDURAL_OPTIMIZATION": false,
+                "ENABLE_ASAN": false,
+                "ENABLE_UBSAN": false,
+                "ENABLE_TSAN": false,
+                "VCPKG_TARGET_TRIPLET": "arm64-linux-gnu"
+            }
+        },
+        {
+            "name": "debug-x64",
+            "inherits": "base-configure",
+            "hidden": false,
+            "displayName": "Debug (x64 - UNTESTED)",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_INTERPROCEDURAL_OPTIMIZATION": false,
+                "ENABLE_ASAN": false,
+                "ENABLE_UBSAN": false,
+                "ENABLE_TSAN": false,
+                "VCPKG_TARGET_TRIPLET": "x64-linux"
+            }
+        },
+        {
+            "name": "debug",
+            "inherits": "debug-arm64",
+            "hidden": false,
+            "displayName": "Debug (Default: ARM64)"
+        },
+        {
+            "name": "debug-clang-tidy",
+            "inherits": "debug",
+            "hidden": false,
+            "cacheVariables": {
+                "CMAKE_CXX_CLANG_TIDY": "clang-tidy"
+            }
+        },
+        {
+            "name": "release-arm64",
+            "inherits": "base-configure",
+            "hidden": false,
+            "displayName": "Release (ARM64)",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "CMAKE_INTERPROCEDURAL_OPTIMIZATION": true,
+                "VCPKG_TARGET_TRIPLET": "arm64-linux-gnu"
+            }
+        },
+        {
+            "name": "release-x64",
+            "inherits": "base-configure",
+            "hidden": false,
+            "displayName": "Release (x64 - UNTESTED)",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "CMAKE_INTERPROCEDURAL_OPTIMIZATION": true,
+                "VCPKG_TARGET_TRIPLET": "x64-linux"
+            }
+        },
+        {
+            "name": "release",
+            "inherits": "release-arm64",
+            "hidden": false,
+            "displayName": "Release (Default: ARM64)"
+        },
+        {
+            "name": "ci-linux",
+            "inherits": "base-configure",
+            "hidden": false,
+            "displayName": "CI Linux Release Build",
+            "description": "Preset optimised for CI/CD pipelines on Linux",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "CMAKE_INTERPROCEDURAL_OPTIMIZATION": true,
+                "BUILD_TESTING": true
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "base-build",
+            "hidden": true,
+            "jobs": 4
+        },
+        {
+            "name": "debug-arm64-build",
+            "inherits": "base-build",
+            "hidden": false,
+            "configurePreset": "debug-arm64",
+            "verbose": true
+        },
+        {
+            "name": "debug-x64-build",
+            "inherits": "base-build",
+            "hidden": false,
+            "configurePreset": "debug-x64",
+            "verbose": true
+        },
+        {
+            "name": "debug-build",
+            "inherits": "base-build",
+            "hidden": false,
+            "configurePreset": "debug",
+            "verbose": true
+        },
+        {
+            "name": "debug-clang-tidy-build",
+            "inherits": "debug-build",
+            "hidden": false,
+            "configurePreset": "debug-clang-tidy",
+            "verbose": true
+        },
+        {
+            "name": "debug-rebuild",
+            "inherits": "debug-build",
+            "hidden": false,
+            "cleanFirst": true
+        },
+        {
+            "name": "release-arm64-build",
+            "inherits": "base-build",
+            "hidden": false,
+            "configurePreset": "release-arm64",
+            "verbose": false
+        },
+        {
+            "name": "release-x64-build",
+            "inherits": "base-build",
+            "hidden": false,
+            "configurePreset": "release-x64",
+            "verbose": false
+        },
+        {
+            "name": "release-build",
+            "inherits": "base-build",
+            "hidden": false,
+            "configurePreset": "release",
+            "verbose": false
+        },
+        {
+            "name": "release-rebuild",
+            "inherits": "release-build",
+            "hidden": false,
+            "cleanFirst": true
+        },
+        {
+            "name": "ci-linux-build",
+            "inherits": "base-build",
+            "hidden": false,
+            "configurePreset": "ci-linux",
+            "verbose": false
+        }
+    ],
+    "testPresets": [
+        {
+            "name": "base-test",
+            "hidden": true,
+            "output": {
+                "outputOnFailure": true,
+                "verbosity": "verbose"
+            },
+            "execution": {
+                "noTestsAction": "error",
+                "stopOnFailure": true
+            }
+        },
+        {
+            "name": "debug-test",
+            "inherits": "base-test",
+            "hidden": false,
+            "configurePreset": "debug"
+        },
+        {
+            "name": "release-test",
+            "inherits": "base-test",
+            "hidden": false,
+            "configurePreset": "release"
+        },
+        {
+            "name": "ci-linux-test",
+            "inherits": "base-test",
+            "hidden": false,
+            "configurePreset": "ci-linux"
+        }
+    ],
+    "packagePresets": [
+        {
+            "name": "base-package",
+            "hidden": true,
+            "generators": [
+                "TGZ"
+            ],
+            "packageDirectory": "package"
+        },
+        {
+            "name": "debug-package",
+            "inherits": "base-package",
+            "hidden": false,
+            "configurePreset": "debug"
+        },
+        {
+            "name": "release-package",
+            "inherits": "base-package",
+            "hidden": false,
+            "configurePreset": "release"
+        },
+        {
+            "name": "ci-linux-package",
+            "inherits": "base-package",
+            "hidden": false,
+            "configurePreset": "ci-linux"
+        }
+    ],
+    "workflowPresets": [
+        {
+            "name": "debug-workflow",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "debug"
+                },
+                {
+                    "type": "build",
+                    "name": "debug-build"
+                },
+                {
+                    "type": "test",
+                    "name": "debug-test"
+                },
+                {
+                    "type": "package",
+                    "name": "debug-package"
+                }
+            ]
+        },
+        {
+            "name": "release-workflow",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "release"
+                },
+                {
+                    "type": "build",
+                    "name": "release-build"
+                },
+                {
+                    "type": "test",
+                    "name": "release-test"
+                },
+                {
+                    "type": "package",
+                    "name": "release-package"
+                }
+            ]
+        },
+        {
+            "name": "ci-linux-workflow",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "ci-linux"
+                },
+                {
+                    "type": "build",
+                    "name": "ci-linux-build"
+                },
+                {
+                    "type": "test",
+                    "name": "ci-linux-test"
+                },
+                {
+                    "type": "package",
+                    "name": "ci-linux-package"
+                }
+            ]
+        }
+    ]
+}
