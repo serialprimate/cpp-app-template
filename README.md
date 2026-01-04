@@ -109,8 +109,8 @@ cpp-app-template/
 
 | Preset | Description |
 |:-------|:------------|
+| `lint` | Linting build with clang-tidy |
 | `debug` | Debug build with symbols |
-| `debug-clang-tidy` | Debug build with clang-tidy analysis |
 | `release` | Optimised release build with LTO |
 | `ci-linux` | CI/CD preset (release + tests enabled) |
 
@@ -118,6 +118,8 @@ cpp-app-template/
 
 | Preset | Description |
 |:-------|:------------|
+| `lint-build` | Build linting configuration |
+| `lint-rebuild` | Clean rebuild (lint) |
 | `debug-build` | Build debug configuration |
 | `debug-rebuild` | Clean rebuild (debug) |
 | `release-build` | Build release configuration |
@@ -188,8 +190,8 @@ Lint all C++ files:
 
 Or build with clang-tidy enabled:
 ```bash
-cmake --preset debug-clang-tidy
-cmake --build --preset debug-clang-tidy-build
+cmake --preset lint
+cmake --build --preset lint-build
 ```
 
 ---

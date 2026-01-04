@@ -42,6 +42,37 @@
             "toolchainFile": "${sourceDir}/external/vcpkg/scripts/buildsystems/vcpkg.cmake"
         },
         {
+            "name": "lint-arm64",
+            "inherits": "base-configure",
+            "hidden": false,
+            "displayName": "Lint (ARM64)",
+            "description": "Configuration for static analysis (clang-tidy) on ARM64",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_CXX_CLANG_TIDY": "clang-tidy",
+                "VCPKG_TARGET_TRIPLET": "arm64-linux-gnu"
+            }
+        },
+        {
+            "name": "lint-x64",
+            "inherits": "base-configure",
+            "hidden": false,
+            "displayName": "Lint (x64 - UNTESTED)",
+            "description": "Configuration for static analysis (clang-tidy) on x64",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_CXX_CLANG_TIDY": "clang-tidy",
+                "VCPKG_TARGET_TRIPLET": "x64-linux"
+            }
+        },
+        {
+            "name": "lint",
+            "inherits": "lint-arm64",
+            "hidden": false,
+            "displayName": "Lint (Default: ARM64)",
+            "description": "Configuration for static analysis (clang-tidy)"
+        },
+        {
             "name": "debug-arm64",
             "inherits": "base-configure",
             "hidden": false,
@@ -74,14 +105,6 @@
             "inherits": "debug-arm64",
             "hidden": false,
             "displayName": "Debug (Default: ARM64)"
-        },
-        {
-            "name": "debug-clang-tidy",
-            "inherits": "debug",
-            "hidden": false,
-            "cacheVariables": {
-                "CMAKE_CXX_CLANG_TIDY": "clang-tidy"
-            }
         },
         {
             "name": "release-arm64",
@@ -131,6 +154,41 @@
             "jobs": 4
         },
         {
+            "name": "lint-arm64-build",
+            "inherits": "base-build",
+            "hidden": false,
+            "configurePreset": "lint-arm64",
+            "displayName": "Lint (ARM64)",
+            "description": "Run clang-tidy on all targets for ARM64",
+            "verbose": true
+        },
+        {
+            "name": "lint-x64-build",
+            "inherits": "base-build",
+            "hidden": false,
+            "configurePreset": "lint-x64",
+            "displayName": "Lint (x64 - UNTESTED)",
+            "description": "Run clang-tidy on all targets for x64",
+            "verbose": true
+        },
+        {
+            "name": "lint-build",
+            "inherits": "lint-arm64-build",
+            "hidden": false,
+            "configurePreset": "lint",
+            "displayName": "Lint (Default: ARM64)",
+            "description": "Run clang-tidy on all targets",
+            "verbose": true
+        },
+        {
+            "name": "lint-rebuild",
+            "inherits": "lint-build",
+            "hidden": false,
+            "cleanFirst": true,
+            "displayName": "Lint Rebuild",
+            "description": "Clean and run clang-tidy on all targets"
+        },
+        {
             "name": "debug-arm64-build",
             "inherits": "base-build",
             "hidden": false,
@@ -149,13 +207,6 @@
             "inherits": "base-build",
             "hidden": false,
             "configurePreset": "debug",
-            "verbose": true
-        },
-        {
-            "name": "debug-clang-tidy-build",
-            "inherits": "debug-build",
-            "hidden": false,
-            "configurePreset": "debug-clang-tidy",
             "verbose": true
         },
         {

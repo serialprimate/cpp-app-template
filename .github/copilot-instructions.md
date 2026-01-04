@@ -9,7 +9,7 @@
 **Current State**: The project implements a minimal working template with:
 - Single application structure (`app/sampleApp/` with `main.cpp`)
 - vcpkg manifest mode with pinned baseline (`vcpkg.json`, `vcpkg-configuration.json`)
-- CMake presets for debug, debug-clang-tidy, and release builds
+- CMake presets for lint, debug, and release builds
 - Workflow presets chaining configure → build → test → package
 - Build hygiene (out-of-source enforcement, sanitiser guards)
 - Basic DevContainer support
@@ -40,7 +40,7 @@
 ### Building & Testing
 
 ```bash
-# Configure (select preset: debug, debug-clang-tidy, release)
+# Configure (select preset: lint, debug, release)
 cmake --preset debug
 
 # Build
@@ -62,8 +62,8 @@ cmake --workflow --preset debug-workflow
 Use VS Code tasks for convenience: "cmake: build all", "cmake: test", "cmake: configure"
 
 **Available CMake Presets:**
-- **Configure**: `debug`, `debug-clang-tidy`, `release`
-- **Build**: `debug-build`, `debug-clang-tidy-build`, `debug-rebuild`, `release-build`, `release-rebuild`
+- **Configure**: `lint`, `debug`, `release`
+- **Build**: `lint-build`, `lint-rebuild`, `debug-build`, `debug-rebuild`, `release-build`, `release-rebuild`
 - **Test**: `debug-test`, `release-test`
 - **Package**: `debug-package`, `release-package` (generates TGZ archives)
 - **Workflow**: `debug-workflow`, `release-workflow` (runs full pipeline)
@@ -102,7 +102,7 @@ The template provides architecture-specific CMake presets:
 ./script/clang-tidy-all.sh
 ```
 
-Use `debug-clang-tidy` preset to enable clang-tidy during build.
+Use `lint` preset to enable clang-tidy during build.
 
 ## Project-Specific Conventions
 
