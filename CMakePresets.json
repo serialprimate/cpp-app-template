@@ -4,6 +4,8 @@
         {
             "name": "base-configure",
             "hidden": true,
+            "displayName": "Base Configuration",
+            "description": "Base configuration preset with common settings",
             "generator": "Unix Makefiles",
             "binaryDir": "${sourceDir}/build/${presetName}",
             "installDir": "${sourceDir}/build/${presetName}/install",
@@ -76,6 +78,7 @@
             "inherits": "base-configure",
             "hidden": false,
             "displayName": "Debug (ARM64)",
+            "description": "Debug configuration for ARM64",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
                 "CMAKE_INTERPROCEDURAL_OPTIMIZATION": false,
@@ -90,6 +93,7 @@
             "inherits": "base-configure",
             "hidden": false,
             "displayName": "Debug (x64 - UNTESTED)",
+            "description": "Debug configuration for x64 (UNTESTED)",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
                 "CMAKE_INTERPROCEDURAL_OPTIMIZATION": false,
@@ -103,13 +107,15 @@
             "name": "debug",
             "inherits": "debug-arm64",
             "hidden": false,
-            "displayName": "Debug (Default: ARM64)"
+            "displayName": "Debug (Default: ARM64)",
+            "description": "Debug configuration (Default: ARM64)"
         },
         {
             "name": "release-arm64",
             "inherits": "base-configure",
             "hidden": false,
             "displayName": "Release (ARM64)",
+            "description": "Release configuration for ARM64",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
                 "CMAKE_INTERPROCEDURAL_OPTIMIZATION": true,
@@ -121,6 +127,7 @@
             "inherits": "base-configure",
             "hidden": false,
             "displayName": "Release (x64 - UNTESTED)",
+            "description": "Release configuration for x64 (UNTESTED)",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
                 "CMAKE_INTERPROCEDURAL_OPTIMIZATION": true,
@@ -131,7 +138,8 @@
             "name": "release",
             "inherits": "release-arm64",
             "hidden": false,
-            "displayName": "Release (Default: ARM64)"
+            "displayName": "Release (Default: ARM64)",
+            "description": "Release configuration (Default: ARM64)"
         },
         {
             "name": "ci-linux",
@@ -150,6 +158,8 @@
         {
             "name": "base-build",
             "hidden": true,
+            "displayName": "Base Build",
+            "description": "Base build preset",
             "jobs": 4
         },
         {
@@ -192,6 +202,8 @@
             "inherits": "base-build",
             "hidden": false,
             "configurePreset": "debug-arm64",
+            "displayName": "Debug Build (ARM64)",
+            "description": "Build the application in Debug mode for ARM64",
             "verbose": true
         },
         {
@@ -199,6 +211,8 @@
             "inherits": "base-build",
             "hidden": false,
             "configurePreset": "debug-x64",
+            "displayName": "Debug Build (x64 - UNTESTED)",
+            "description": "Build the application in Debug mode for x64",
             "verbose": true
         },
         {
@@ -206,19 +220,25 @@
             "inherits": "base-build",
             "hidden": false,
             "configurePreset": "debug",
+            "displayName": "Debug Build (Default: ARM64)",
+            "description": "Build the application in Debug mode",
             "verbose": true
         },
         {
             "name": "debug-rebuild",
             "inherits": "debug-build",
             "hidden": false,
-            "cleanFirst": true
+            "cleanFirst": true,
+            "displayName": "Debug Rebuild",
+            "description": "Clean and build the application in Debug mode"
         },
         {
             "name": "release-arm64-build",
             "inherits": "base-build",
             "hidden": false,
             "configurePreset": "release-arm64",
+            "displayName": "Release Build (ARM64)",
+            "description": "Build the application in Release mode for ARM64",
             "verbose": false
         },
         {
@@ -226,6 +246,8 @@
             "inherits": "base-build",
             "hidden": false,
             "configurePreset": "release-x64",
+            "displayName": "Release Build (x64 - UNTESTED)",
+            "description": "Build the application in Release mode for x64",
             "verbose": false
         },
         {
@@ -233,19 +255,25 @@
             "inherits": "base-build",
             "hidden": false,
             "configurePreset": "release",
+            "displayName": "Release Build (Default: ARM64)",
+            "description": "Build the application in Release mode",
             "verbose": false
         },
         {
             "name": "release-rebuild",
             "inherits": "release-build",
             "hidden": false,
-            "cleanFirst": true
+            "cleanFirst": true,
+            "displayName": "Release Rebuild",
+            "description": "Clean and build the application in Release mode"
         },
         {
             "name": "ci-linux-build",
             "inherits": "base-build",
             "hidden": false,
             "configurePreset": "ci-linux",
+            "displayName": "CI Linux Build",
+            "description": "Build the application for CI on Linux",
             "verbose": false
         }
     ],
@@ -253,6 +281,8 @@
         {
             "name": "base-test",
             "hidden": true,
+            "displayName": "Base Test",
+            "description": "Base test preset",
             "output": {
                 "outputOnFailure": true,
                 "verbosity": "verbose"
@@ -266,25 +296,33 @@
             "name": "debug-test",
             "inherits": "base-test",
             "hidden": false,
-            "configurePreset": "debug"
+            "configurePreset": "debug",
+            "displayName": "Debug Test",
+            "description": "Run tests for the Debug build"
         },
         {
             "name": "release-test",
             "inherits": "base-test",
             "hidden": false,
-            "configurePreset": "release"
+            "configurePreset": "release",
+            "displayName": "Release Test",
+            "description": "Run tests for the Release build"
         },
         {
             "name": "ci-linux-test",
             "inherits": "base-test",
             "hidden": false,
-            "configurePreset": "ci-linux"
+            "configurePreset": "ci-linux",
+            "displayName": "CI Linux Test",
+            "description": "Run tests for the CI Linux build"
         }
     ],
     "packagePresets": [
         {
             "name": "base-package",
             "hidden": true,
+            "displayName": "Base Package",
+            "description": "Base package preset",
             "generators": [
                 "TGZ"
             ],
@@ -294,24 +332,32 @@
             "name": "debug-package",
             "inherits": "base-package",
             "hidden": false,
-            "configurePreset": "debug"
+            "configurePreset": "debug",
+            "displayName": "Debug Package",
+            "description": "Generate package for the Debug build"
         },
         {
             "name": "release-package",
             "inherits": "base-package",
             "hidden": false,
-            "configurePreset": "release"
+            "configurePreset": "release",
+            "displayName": "Release Package",
+            "description": "Generate package for the Release build"
         },
         {
             "name": "ci-linux-package",
             "inherits": "base-package",
             "hidden": false,
-            "configurePreset": "ci-linux"
+            "configurePreset": "ci-linux",
+            "displayName": "CI Linux Package",
+            "description": "Generate package for the CI Linux build"
         }
     ],
     "workflowPresets": [
         {
             "name": "debug-workflow",
+            "displayName": "Debug Workflow",
+            "description": "Full Debug workflow: configure, build, test, and package",
             "steps": [
                 {
                     "type": "configure",
@@ -333,6 +379,8 @@
         },
         {
             "name": "release-workflow",
+            "displayName": "Release Workflow",
+            "description": "Full Release workflow: configure, build, test, and package",
             "steps": [
                 {
                     "type": "configure",
@@ -354,6 +402,8 @@
         },
         {
             "name": "ci-linux-workflow",
+            "displayName": "CI Linux Workflow",
+            "description": "Full CI Linux workflow: configure, build, test, and package",
             "steps": [
                 {
                     "type": "configure",
