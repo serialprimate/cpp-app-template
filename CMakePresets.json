@@ -16,7 +16,6 @@
                 "ENABLE_ASAN": false,
                 "ENABLE_TSAN": false,
                 "ENABLE_UBSAN": false,
-                "VCPKG_TARGET_TRIPLET": "arm64-linux-gnu",
                 "VCPKG_OVERLAY_TRIPLETS": "${sourceDir}/vcpkg/triplets",
                 "VCPKG_BOOTSTRAP_OPTIONS": "-disableMetrics",
                 "VCPKG_INSTALL_OPTIONS": "--clean-after-build"
