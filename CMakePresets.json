@@ -142,16 +142,31 @@
             "description": "Release configuration (Default: ARM64)"
         },
         {
-            "name": "ci-linux",
-            "inherits": "base-configure",
+            "name": "ci-linux-arm64",
+            "inherits": "release-arm64",
             "hidden": false,
-            "displayName": "CI Linux Release Build",
-            "description": "Preset optimised for CI/CD pipelines on Linux",
+            "displayName": "CI Linux Release Build (ARM64)",
+            "description": "Preset optimised for CI/CD pipelines on ARM64",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release",
-                "CMAKE_INTERPROCEDURAL_OPTIMIZATION": true,
                 "BUILD_TESTING": true
             }
+        },
+        {
+            "name": "ci-linux-x64",
+            "inherits": "release-x64",
+            "hidden": false,
+            "displayName": "CI Linux Release Build (x64 - UNTESTED)",
+            "description": "Preset optimised for CI/CD pipelines on x64",
+            "cacheVariables": {
+                "BUILD_TESTING": true
+            }
+        },
+        {
+            "name": "ci-linux",
+            "inherits": "ci-linux-arm64",
+            "hidden": false,
+            "displayName": "CI Linux Release Build (Default: ARM64)",
+            "description": "Preset optimised for CI/CD pipelines"
         }
     ],
     "buildPresets": [
@@ -268,12 +283,30 @@
             "description": "Clean and build the application in Release mode"
         },
         {
-            "name": "ci-linux-build",
+            "name": "ci-linux-arm64-build",
             "inherits": "base-build",
             "hidden": false,
+            "configurePreset": "ci-linux-arm64",
+            "displayName": "CI Linux Build (ARM64)",
+            "description": "Build the application for CI on ARM64",
+            "verbose": false
+        },
+        {
+            "name": "ci-linux-x64-build",
+            "inherits": "base-build",
+            "hidden": false,
+            "configurePreset": "ci-linux-x64",
+            "displayName": "CI Linux Build (x64 - UNTESTED)",
+            "description": "Build the application for CI on x64",
+            "verbose": false
+        },
+        {
+            "name": "ci-linux-build",
+            "inherits": "ci-linux-arm64-build",
+            "hidden": false,
             "configurePreset": "ci-linux",
-            "displayName": "CI Linux Build",
-            "description": "Build the application for CI on Linux",
+            "displayName": "CI Linux Build (Default: ARM64)",
+            "description": "Build the application for CI",
             "verbose": false
         }
     ],
