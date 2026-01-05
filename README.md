@@ -112,7 +112,7 @@ cpp-app-template/
 | `lint` | Linting build with clang-tidy |
 | `debug` | Debug build with symbols |
 | `release` | Optimised release build with LTO |
-| `ci-linux` | CI/CD preset (release + tests enabled) |
+| `ci` | CI/CD preset (release + tests enabled) |
 
 ### Build Presets
 
@@ -123,7 +123,7 @@ cpp-app-template/
 | `debug-build` | Build debug configuration |
 | `debug-rebuild` | Clean rebuild (debug) |
 | `release-build` | Build release configuration |
-| `ci-linux-build` | Build CI configuration |
+| `ci-build` | Build CI configuration |
 
 ### Test Presets
 
@@ -131,7 +131,7 @@ cpp-app-template/
 |:-------|:------------|
 | `debug-test` | Run tests in debug mode |
 | `release-test` | Run tests in release mode |
-| `ci-linux-test` | Run CI tests |
+| `ci-test` | Run CI tests |
 
 ### Workflow Presets
 
@@ -140,7 +140,7 @@ Workflows chain configure → build → test → package:
 ```bash
 cmake --workflow --preset debug-workflow
 cmake --workflow --preset release-workflow
-cmake --workflow --preset ci-linux-workflow
+cmake --workflow --preset ci-workflow
 ```
 
 ---

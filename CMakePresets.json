@@ -142,7 +142,7 @@
             "description": "Release configuration (Default: ARM64)"
         },
         {
-            "name": "ci-linux-arm64",
+            "name": "ci-arm64",
             "inherits": "release-arm64",
             "hidden": false,
             "displayName": "CI Linux Release Build (ARM64)",
@@ -152,7 +152,7 @@
             }
         },
         {
-            "name": "ci-linux-x64",
+            "name": "ci-x64",
             "inherits": "release-x64",
             "hidden": false,
             "displayName": "CI Linux Release Build (x64 - UNTESTED)",
@@ -162,8 +162,8 @@
             }
         },
         {
-            "name": "ci-linux",
-            "inherits": "ci-linux-arm64",
+            "name": "ci",
+            "inherits": "ci-arm64",
             "hidden": false,
             "displayName": "CI Linux Release Build (Default: ARM64)",
             "description": "Preset optimised for CI/CD pipelines"
@@ -283,28 +283,28 @@
             "description": "Clean and build the application in Release mode"
         },
         {
-            "name": "ci-linux-arm64-build",
+            "name": "ci-arm64-build",
             "inherits": "base-build",
             "hidden": false,
-            "configurePreset": "ci-linux-arm64",
+            "configurePreset": "ci-arm64",
             "displayName": "CI Linux Build (ARM64)",
             "description": "Build the application for CI on ARM64",
             "verbose": false
         },
         {
-            "name": "ci-linux-x64-build",
+            "name": "ci-x64-build",
             "inherits": "base-build",
             "hidden": false,
-            "configurePreset": "ci-linux-x64",
+            "configurePreset": "ci-x64",
             "displayName": "CI Linux Build (x64 - UNTESTED)",
             "description": "Build the application for CI on x64",
             "verbose": false
         },
         {
-            "name": "ci-linux-build",
-            "inherits": "ci-linux-arm64-build",
+            "name": "ci-build",
+            "inherits": "ci-arm64-build",
             "hidden": false,
-            "configurePreset": "ci-linux",
+            "configurePreset": "ci",
             "displayName": "CI Linux Build (Default: ARM64)",
             "description": "Build the application for CI",
             "verbose": false
@@ -342,10 +342,10 @@
             "description": "Run tests for the Release build"
         },
         {
-            "name": "ci-linux-test",
+            "name": "ci-test",
             "inherits": "base-test",
             "hidden": false,
-            "configurePreset": "ci-linux",
+            "configurePreset": "ci",
             "displayName": "CI Linux Test",
             "description": "Run tests for the CI Linux build"
         }
@@ -378,10 +378,10 @@
             "description": "Generate package for the Release build"
         },
         {
-            "name": "ci-linux-package",
+            "name": "ci-package",
             "inherits": "base-package",
             "hidden": false,
-            "configurePreset": "ci-linux",
+            "configurePreset": "ci",
             "displayName": "CI Linux Package",
             "description": "Generate package for the CI Linux build"
         }
@@ -434,25 +434,25 @@
             ]
         },
         {
-            "name": "ci-linux-workflow",
+            "name": "ci-workflow",
             "displayName": "CI Linux Workflow",
             "description": "Full CI Linux workflow: configure, build, test, and package",
             "steps": [
                 {
                     "type": "configure",
-                    "name": "ci-linux"
+                    "name": "ci"
                 },
                 {
                     "type": "build",
-                    "name": "ci-linux-build"
+                    "name": "ci-build"
                 },
                 {
                     "type": "test",
-                    "name": "ci-linux-test"
+                    "name": "ci-test"
                 },
                 {
                     "type": "package",
-                    "name": "ci-linux-package"
+                    "name": "ci-package"
                 }
             ]
         }
