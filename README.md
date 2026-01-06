@@ -40,7 +40,6 @@ cpp-app-template/
 │   └── int/                # Integration tests (scenario-based)
 │       └── appIntTest/
 ├── doc/                    # Documentation
-│   ├── PRD.md              # Product requirements
 │   └── ARCHITECTURE.md     # Architecture guide
 ├── script/                 # Helper scripts
 │   ├── clang-format-all.sh
@@ -380,9 +379,7 @@ Checks: '-modernize-use-trailing-return-type'
 
 ## Documentation
 
-- [PRD (Product Requirements)](doc/PRD.md) - Complete requirements specification
 - [Architecture Guide](doc/ARCHITECTURE.md) - Design patterns and principles
-- [Implementation Plan](doc/implementation_plan_phase_1.md) - Phase 1 development plan
 
 ---
 

@@ -4,32 +4,25 @@
 
 **cpp-app-template** is a modern C++23 application template built with CMake and vcpkg. This template enforces production-ready practices, reproducible builds, and modular architecture.
 
-**Platform Support**: This template supports **Linux only**. Support for other operating systems is not provided or planned.
+**Platform Support**: This template supports **Linux only**. Support for other operating systems is not provided.
 
 **Current State**: The project implements a minimal working template with:
 - Single application structure (`app/sampleApp/` with `main.cpp`)
-- vcpkg manifest mode with pinned baseline (`vcpkg.json`, `vcpkg-configuration.json`)
-- CMake presets for lint, debug, and release builds
+- vcpkg manifest mode with a pinned `builtin-baseline` (in `vcpkg.json`)
+- CMake presets for lint, debug, release, and CI builds
 - Workflow presets chaining configure → build → test → package
-- Build hygiene (out-of-source enforcement, sanitiser guards)
-- Basic DevContainer support
-
-**Future Architecture**: See `doc/PRD.md` (v2.0.0 Draft) for the complete target specification including:
-- Modular layout (`app/`, `lib/`, `test/unit/`, `test/int/`)
-- Interface+factory pattern for encapsulation (PRD section 6)
-- GoogleTest integration and testing strategy (PRD section 5.4)
-- DevContainer and CI/CD setup (PRD sections 5.3, 8)
-- Rename script and project initialization workflow (PRD section 7)
+- Build hygiene (out-of-source enforcement, sanitiser guards for release builds)
+- DevContainer support
 
 ### Architecture & Structure
 
 **Current Layout:**
-- **Root CMakeLists.txt**: Orchestrates the build, enforces out-of-source builds, configures sanitizers (debug only), and sets up CPack packaging
+- **Root CMakeLists.txt**: Orchestrates the build, enforces out-of-source builds, configures sanitisers (non-release build types only), and sets up CPack packaging
 - **app/**: Contains application modules (currently `sampleApp/` with `main.cpp`)
 - **external/vcpkg/**: vcpkg submodule for dependency management (manifest mode)
 - **vcpkg/**: Project-owned vcpkg configuration (cache + overlay triplets)
 - **script/**: Helper scripts for formatting, linting, and vcpkg lifecycle
-- **doc/**: Project documentation including PRD (requirements document for v2.0)
+- **doc/**: Project documentation including ARCHITECTURE.md
 - **build/**: Generated build artifacts (never committed)
 - **vcpkg/cache/**: Local binary cache for vcpkg artifacts (not committed)
 - **vcpkg/triplets/**: Overlay triplets for custom toolchain configuration
@@ -40,7 +33,7 @@
 ### Building & Testing
 
 ```bash
-# Configure (select preset: lint, debug, release)
+# Configure (select preset: lint, debug, release, ci)
 cmake --preset debug
 
 # Build
@@ -53,7 +46,7 @@ ctest --preset debug-test --output-on-failure
 cmake --build --preset debug-rebuild
 
 # Package
-cpack --preset release-package
+cpack --preset debug-package
 
 # Full workflow (configure + build + test + package)
 cmake --workflow --preset debug-workflow
@@ -62,47 +55,48 @@ cmake --workflow --preset debug-workflow
 Use VS Code tasks for convenience: "cmake: build all", "cmake: test", "cmake: configure"
 
 **Available CMake Presets:**
-- **Configure**: `lint`, `debug`, `release`
-- **Build**: `lint-build`, `lint-rebuild`, `debug-build`, `debug-rebuild`, `release-build`, `release-rebuild`
-- **Test**: `debug-test`, `release-test`
-- **Package**: `debug-package`, `release-package` (generates TGZ archives)
-- **Workflow**: `debug-workflow`, `release-workflow` (runs full pipeline)
+- **Configure**: `lint`, `debug`, `release`, `ci` (plus `*-arm64` and `*-x64` variants)
+- **Build**: `lint-build`, `lint-rebuild`, `debug-build`, `debug-rebuild`, `release-build`, `release-rebuild`, `ci-build`
+- **Test**: `debug-test`, `release-test`, `ci-test`
+- **Package**: `debug-package`, `release-package`, `ci-package` (TGZ)
+- **Workflow**: `debug-workflow`, `release-workflow`, `ci-workflow` (configure → build → test → package)
 
 ### VS Code (Current)
 
 - Tasks live in `.vscode/tasks.json` and are driven by the active CMake preset (CMake Tools).
 - Debugging lives in `.vscode/launch.json` and resolves the executable via CMake Tools (launch target path).
-- Future/required VS Code integration behaviour is specified in `doc/PRD.md` section 7.3.
 
 ### Dependency Management
 
 - vcpkg is tracked as a git submodule at `external/vcpkg/`
 - Add dependencies to `vcpkg.json` (manifest file)
 - Use `find_package(<Pkg> CONFIG REQUIRED)` in CMakeLists.txt
-- Link via imported targets: `target_link_libraries(... PRIVATE <Pkg>::<Pkg>)`
+- Link via the package's exported CMake targets (examples: `fmt::fmt`, `GTest::gtest`, `GTest::gtest_main`). Target names vary by package.
 - Submodule initialisation: `git submodule update --init --recursive`
 - vcpkg bootstrap: `./external/vcpkg/bootstrap-vcpkg.sh -disableMetrics`
 - Or use convenience script: `./script/vcpkg-bootstrap.sh`
 
 ### Architecture Selection
 
-The template provides architecture-specific CMake presets:
-- **arm64-linux-gnu**: Custom triplet for ARM64 systems with GNU toolchain (primary supported platform)
-- **x64-linux**: Standard preset for 64-bit Intel/AMD systems (untested, planned support)
-- Default presets (`debug`, `release`) use ARM64
-- Select architecture explicitly when needed: `cmake --preset debug-arm64` or `cmake --preset debug-x64`
+This template is configured around vcpkg triplets and matching CMake presets:
+- vcpkg triplets: `arm64-linux-gnu` (overlay triplet in `vcpkg/triplets/`) and `x64-linux` (built-in vcpkg triplet)
+- CMake configure presets: `*-arm64` and `*-x64` variants (the `*-x64` variants are labelled **UNTESTED** in the preset metadata)
+- Default configure presets (`lint`, `debug`, `release`, `ci`) inherit from the ARM64 variants
+- Select an architecture explicitly when needed: `cmake --preset debug-arm64` or `cmake --preset debug-x64`
 
 ### Code Quality Tools
 
 ```bash
-# Format all C++ files (uses .clang-format with Mozilla style)
+# Format all C++ files (uses the repo's .clang-format)
 ./script/clang-format-all.sh
 
-# Lint all C++ files (uses .clang-tidy configuration)
+# Lint all C++ files (clang-tidy reads the repo's .clang-tidy)
 ./script/clang-tidy-all.sh
 ```
 
 Use `lint` preset to enable clang-tidy during build.
+
+Note: `./script/clang-tidy-all.sh` runs clang-tidy with `-p build/debug`. Ensure you've configured `debug` at least once (e.g. `cmake --preset debug`) before running it, or adjust the script/build directory.
 
 ## Project-Specific Conventions
 
@@ -115,9 +109,9 @@ Use `lint` preset to enable clang-tidy during build.
 - **Variables**: camelCase (e.g., `filePath`, `bufferSize`)
 - **Constants**: PascalCase or ALL_CAPS
 - **Namespaces**: camelCase (e.g., `myProj`, `testHelpers`)
-- **Test executables**: PascalCase with standardised suffixes:
-  - Unit tests: `<lib-name>UnitTest` (e.g., `loggerUnitTest`, `dataProcessorUnitTest`)
-  - Integration tests: `<component-name>IntTest` (e.g., `appIntTest`, `databaseIntTest`)
+- **CMake targets/executables**: lowerCamelCase with standardised suffixes:
+  - Unit tests: `<lib-name>UnitTest` (e.g., `loggerUnitTest`)
+  - Integration tests: `<component-name>IntTest` (e.g., `appIntTest`)
 - **Test suites (GTest fixtures)**: PascalCase with descriptive suffix:
   - Unit tests: `<class-name>Test` (e.g., `LoggerFactoryTest`, `ConsoleLoggerTest`)
   - Integration tests: Descriptive name ending in `Suite` using `Int` abbreviation (e.g., `AppLoggingIntSuite`, `AppLifecycleSuite`)
@@ -126,8 +120,7 @@ Use `lint` preset to enable clang-tidy during build.
 
 - **C++23** is the default language standard
 - Use modern idioms: RAII, smart pointers, `std::format`, concepts, ranges
-- Enable strict warnings: `-Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion`
-- Treat warnings as errors (enabled by default in target compile options)
+- Compiler warnings are treated as errors by default on targets in this repo (e.g. `-Wall -Wextra -Wpedantic -Werror` for GNU/Clang)
 
 ### CMake Patterns
 
@@ -137,12 +130,10 @@ Use `lint` preset to enable clang-tidy during build.
   - `PRIVATE`: Implementation-only (compile options, private deps, internal includes)
   - `PUBLIC`: Required by target and consumers (transitive deps, public API)
   - `INTERFACE`: Required only by consumers (header-only libs, usage requirements)
-- **Never** mutate global state (`include_directories()`, `link_libraries()`, `add_definitions()`, global `CMAKE_CXX_FLAGS`)
+- Prefer target-based configuration. Avoid global state (`include_directories()`, `link_libraries()`, `add_definitions()`, global `CMAKE_CXX_FLAGS`).
 - Express language standard via `target_compile_features(... PRIVATE cxx_std_23)`, not global `CMAKE_CXX_STANDARD`
 - Keep CMakeLists.txt structure uniform across all modules
 - Prefer CMake Presets over cache variables for developer options
-
-**See PRD section 5.1.6 for complete target-based architecture requirements.**
 
 ### Testing Conventions
 
@@ -164,33 +155,16 @@ Use `lint` preset to enable clang-tidy during build.
 - **Linking**: May link multiple internal libraries
 - **Structure**: Each test suite is a collection of related use-cases; each test case is an individual scenario
 
-**See PRD section 5.4 and ARCHITECTURE.md "Adding Tests" for complete testing requirements and examples.**
+**See ARCHITECTURE.md "Adding Tests" for complete testing requirements and examples.**
 
 ### Build Hygiene
 
 - Out-of-source builds enforced (root CMakeLists.txt checks and errors)
-- Sanitizers (ASAN, UBSAN, TSAN) available via CMake options but **only** in debug builds
+- Sanitisers (`ENABLE_ASAN`, `ENABLE_UBSAN`, `ENABLE_TSAN`) are guarded so they cannot be enabled for `Release`/`MinSizeRel` build types
 - `CMAKE_EXPORT_COMPILE_COMMANDS=ON` for IDE/tool integration (compile_commands.json)
 - vcpkg binary caching via `VCPKG_BINARY_SOURCES="clear;files,${sourceDir}/vcpkg/cache,readwrite"`
 - vcpkg metrics disabled: `VCPKG_BOOTSTRAP_OPTIONS="-disableMetrics"`
 - vcpkg install options: `VCPKG_INSTALL_OPTIONS="--clean-after-build"` (keeps builds lean)
-
-## Future Architecture (PRD Reference)
-
-**When implemented, this template will support:**
-- Modular library structure with public/private API separation (PRD section 6.2)
-- Interface+factory pattern for encapsulation (PRD section 6.3, with CMake example)
-- GoogleTest-based unit and integration testing (PRD section 5.4)
-- Composition roots that wire dependencies only in `app/*/src/main.cpp` (PRD section 6.2)
-- DevContainer setup and CI/CD workflow (PRD sections 5.3, 8)
-- Project rename script (PRD section 7.1)
-
-**Consult `doc/PRD.md` for:**
-- Complete naming conventions (section 6.1)
-- CMake target scope requirements (section 5.1.6)
-- Testing strategy and GoogleTest integration (section 5.4)
-- Architectural patterns and encapsulation rules (section 6)
-- CI/CD pipeline requirements (section 8)
 
 ## Language-Specific Instructions
 
@@ -211,15 +185,12 @@ Always read the applicable instruction file before creating or modifying files o
 - ❌ Don't use raw pointers for ownership (use `std::unique_ptr` or `std::shared_ptr`)
 - ❌ Don't sprinkle `#include` without forward declarations
 - ❌ Don't ignore preset naming (base presets are `hidden: true`, only concrete presets are selectable)
-- ❌ Don't use global CMake mutations - see PRD section 5.1.6 for target-based requirements
+- ❌ Don't use global CMake mutations - use modern CMake target-based configurations
 - ❌ Don't set `CMAKE_CXX_STANDARD` globally - use `target_compile_features(... PRIVATE cxx_std_23)`
 - ❌ Don't commit `build/`, `vcpkg/cache/`, or `CMakeUserPresets.json`
-
 - ❌ Don't forget to initialise submodules after cloning (`git submodule update --init --recursive`)
 - ❌ Don't use untested x64 presets without verifying on x64 hardware
 - ❌ Don't move vcpkg overlay triplets out of `vcpkg/triplets/` (breaks preset paths)
-
-**For future architecture pitfalls (interface+factory, composition roots), see PRD section 6.**
 
 ## Quick Reference
 
@@ -227,6 +198,7 @@ Always read the applicable instruction file before creating or modifying files o
 |------|---------|
 | Bootstrap vcpkg | `./script/vcpkg-bootstrap.sh` |
 | Configure debug | `cmake --preset debug` |
+| Configure CI | `cmake --preset ci` |
 | Build | `cmake --build --preset debug-build` |
 | Test | `ctest --preset debug-test --output-on-failure` |
 | Package | `cpack --preset release-package` |
@@ -239,7 +211,6 @@ Always read the applicable instruction file before creating or modifying files o
 
 - Always check syntax, style, completeness, consistency, and logic errors
 - Follow all language-specific instructions from `.github/instructions/*.md`
-- Consult `doc/PRD.md` for requirements on unimplemented features
 - Use Australian English spelling and grammar
 - Comment code thoroughly with Doxygen-compatible documentation
 - You are working in a DevContainer, ensure that the configuration is maintained
