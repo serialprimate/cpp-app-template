@@ -68,7 +68,7 @@ jobs:
       - name: Upload package artefact
         uses: actions/upload-artifact@v4
         with:
-          name: package-${{ runner.os }}-${{ matrix.platform }}
+          name: package-${{ runner.os }}-${{ matrix.platform.replace('/', '-') }}
           if-no-files-found: error
           path: |
             build/ci/package/*.tar.gz
