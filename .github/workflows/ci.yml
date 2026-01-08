@@ -53,8 +53,9 @@ jobs:
           configFile: .devcontainer/devcontainer.json
           imageName: ghcr.io/${{ github.repository }}-devcontainer
           cacheFrom: ghcr.io/${{ github.repository }}-devcontainer
-          platform: ${{ matrix.platform }}
-          push: always
+          push: filter
+          eventFilterForPush: push
+          refFilterForPush: refs/heads/main
           runCmd: |
             set -euo pipefail
             git submodule update --init --recursive
