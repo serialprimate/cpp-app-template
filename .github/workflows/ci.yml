@@ -1,0 +1,75 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  ci:
+    name: Build, test, package (ci)
+    runs-on: ubuntu-24.04-arm
+
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - linux-arm64
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Restore vcpkg binary cache
+        uses: actions/cache@v4
+        with:
+          path: vcpkg/cache
+          key: vcpkg-cache-${{ runner.os }}-${{ matrix.platform }}-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json') }}
+          restore-keys: |
+            vcpkg-cache-${{ runner.os }}-${{ matrix.platform }}-
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and run CI inside devcontainer
+        uses: devcontainers/ci@v0.3
+        with:
+          configFile: .devcontainer/devcontainer.json
+          imageName: ghcr.io/${{ github.repository }}-devcontainer
+          cacheFrom: ghcr.io/${{ github.repository }}-devcontainer
+          push: filter
+          eventFilterForPush: push
+          refFilterForPush: refs/heads/main
+          runCmd: |
+            set -euo pipefail
+            git submodule update --init --recursive
+            if [ ! -f ./external/vcpkg/vcpkg ]; then
+              ./external/vcpkg/bootstrap-vcpkg.sh -disableMetrics
+            fi
+            cmake --workflow --preset ci-workflow
+
+      - name: Upload package artefact
+        uses: actions/upload-artifact@v4
+        with:
+          name: package-${{ runner.os }}-${{ matrix.platform }}
+          if-no-files-found: error
+          path: |
+            build/ci/package/*.tar.gz
+            build/ci/package/*.tgz
